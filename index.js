@@ -149,8 +149,8 @@ async function run() {
     });
 
     // APIs end here
-    await client.db("admin").command({ ping: 1 });
-    console.log("successfully connected to MongoDB!");
+    // await client.db("admin").command({ ping: 1 });
+    // console.log("successfully connected to MongoDB!");
   } finally {
     // await client.close();
   }
