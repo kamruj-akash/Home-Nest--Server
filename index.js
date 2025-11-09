@@ -51,8 +51,6 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
-    await client.connect();
-
     // create collections
     const homeNestDB = client.db("homeNest_database");
     const propertyCollection = homeNestDB.collection("properties");
