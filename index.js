@@ -4,8 +4,12 @@ const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
 const admin = require("firebase-admin");
-const serviceAccount = require("./firebaseAdminSDK.json");
 require("dotenv").config();
+
+const decoded = Buffer.from(process.env.firebase_SDK, "base64").toString(
+  "utf8"
+);
+const serviceAccount = JSON.parse(decoded);
 
 admin.initializeApp({
   credential: admin.credential.cert(serviceAccount),
