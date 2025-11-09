@@ -103,6 +103,15 @@ async function run() {
       res.send(result);
     });
 
+    app.patch("/property/:id", async (req, res) => {
+      const id = req.params.id;
+      const propertyId = { _id: new ObjectId(id) };
+      const updateData = req.header;
+      const update = { $set: updateData };
+      const result = await propertyCollection.updateOne(propertyId, update);
+      res.send(result);
+    });
+
     // Ratings related APIs
     app.post("/ratings", verifyFirebaseToken, async (req, res) => {
       const ratingsBody = req.body;
