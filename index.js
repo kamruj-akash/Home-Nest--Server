@@ -12,6 +12,10 @@ admin.initializeApp({
 });
 
 const verifyFirebaseToken = async (req, res, next) => {
+  if (!req.headers.authorization) {
+    res.status(401).send("un-authorize access!");
+    return;
+  }
   const userToken = req.headers.authorization.split(" ")[1];
   if (!userToken) {
     res.status(401).send("un-authorize access!");
@@ -91,10 +95,16 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/ratings", async (req, res) => {
-      const cursor = ratingsCollection.find();
-      const result = await cursor.toArray();
-      res.send(result);
+    app.get("/ratings", verifyFirebaseToken, async (req, res) => {
+      const firebaseTokenEmail = req.tokenEmail;
+      const userEmail = req.query.email;
+      const query = {};
+      if (userEmail == firebaseTokenEmail) {
+        query.reviewerEmail = userEmail;
+        const cursor = ratingsCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+      }
     });
 
     app.delete("/ratings/:id", async (req, res) => {
