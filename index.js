@@ -54,11 +54,13 @@ async function run() {
     const propertyCollection = homeNestDB.collection("properties");
     const ratingsCollection = homeNestDB.collection("ratings");
 
-    app.post("/properties", async (req, res) => {
+    // property related APIs
+    app.post("/properties", verifyFirebaseToken, async (req, res) => {
       const newProperty = req.body;
       const result = await propertyCollection.insertOne(newProperty);
       res.send(result);
     });
+
     app.get("/all-properties", async (req, res) => {
       const cursor = propertyCollection.find();
       const result = await cursor.toArray();
@@ -79,6 +81,19 @@ async function run() {
       const propertyId = { _id: new ObjectId(id) };
       const result = await propertyCollection.findOne(propertyId);
       res.send(result);
+    });
+
+    app.get("/property", verifyFirebaseToken, async (req, res) => {
+      const firebaseTokenEmail = req.tokenEmail;
+      const userEmail = req.query.email;
+
+      const query = {};
+      if (userEmail == firebaseTokenEmail) {
+        query.owner_email = userEmail;
+        const cursor = propertyCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+      }
     });
 
     app.delete("/property/:id", async (req, res) => {
@@ -107,7 +122,7 @@ async function run() {
       }
     });
 
-    app.delete("/ratings/:id", async (req, res) => {
+    app.delete("/ratings/:id", verifyFirebaseToken, async (req, res) => {
       const id = req.params.id;
       const ratingId = { _id: new ObjectId(id) };
       const result = await ratingsCollection.deleteOne(ratingId);
