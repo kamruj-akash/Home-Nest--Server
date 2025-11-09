@@ -18,7 +18,7 @@ const verifyFirebaseToken = async (req, res, next) => {
   }
   const userToken = req.headers.authorization.split(" ")[1];
   if (!userToken) {
-    res.status(401).send("un-authorize access!");
+    res.status(401).send({ message: "un-authorize access!" });
     return;
   }
   try {
@@ -103,13 +103,19 @@ async function run() {
       res.send(result);
     });
 
-    app.patch("/property/:id", async (req, res) => {
+    app.patch("/property/:id", verifyFirebaseToken, async (req, res) => {
       const id = req.params.id;
+      const updateData = req.body;
       const propertyId = { _id: new ObjectId(id) };
-      const updateData = req.header;
-      const update = { $set: updateData };
-      const result = await propertyCollection.updateOne(propertyId, update);
-      res.send(result);
+      const firebaseTokenEmail = req.tokenEmail;
+      const ownerEmail = req.body.owner_email;
+      if (ownerEmail == firebaseTokenEmail) {
+        const update = { $set: updateData };
+        const result = await propertyCollection.updateOne(propertyId, update);
+        res.send(result);
+      } else {
+        res.status(403).send({ message: "forbidden access" });
+      }
     });
 
     // Ratings related APIs
