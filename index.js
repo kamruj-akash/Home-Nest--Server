@@ -64,7 +64,7 @@ async function run() {
     });
 
     app.get("/all-properties", async (req, res) => {
-      const cursor = propertyCollection.find();
+      const cursor = propertyCollection.find().sort({ postedDate: -1 });
       const result = await cursor.toArray();
       res.send(result);
     });
